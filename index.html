@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <title>Compare Commutes</title>
+    <link rel="shortcut icon" href="./favicon.png" type="image/x-icon">
+    <script
+      src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.js'>
+    </script>
+    <link
+      href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css'
+      rel='stylesheet' />
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+      crossorigin="anonymous" />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div id="col-left" class="col-md-6 col-sm-12">
+        <div id="geocoder-holder" class="col-xs-12"></div>
+        <div id="app" class="col-xs-12"></div>
+      </div>
+      <div id="col-right" class="col-md-6 col-sm-12">
+        <div class="col-xs-12" style="height:100%; min-height:50vh" id="map">
+        </div>
+      </div>
+    </div>
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.1/mapbox-gl-geocoder.min.js'></script>
+    <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.1/mapbox-gl-geocoder.css' type='text/css' />
+  </body>
+</html>
