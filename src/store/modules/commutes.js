@@ -112,6 +112,7 @@ export const mutations = {
   update(commutes, payload) {
     let update = new Commute(payload);
     let prev = commutes[update.id];
+    assert.ok(prev, `no commute found with ${update.id}`);
     if (prev) {
       set(commutes, update.id, {...prev, ...update});
     } else {
@@ -123,63 +124,55 @@ export const mutations = {
   }
 };
 
-// const clone = (name, context, payload) => {
-//   let {dispatch, state: commutes} = context;
-//   let {id} = payload;
-//   if (id in commutes && payload[name] != commutes[id][name]) {
-//     dispatch(
-//       'addCommute',
-//       Object.assign({}, commutes[id], {[name]: payload[name]})
-//     );
-//   }
-// };
-
+const setOfEssentialAttrs = new Set(essentialAttrs);
 export const actions = {
   startup({state}) {
     // TODO: add
   },
   add({commit, rootState}, payload) {
-    // console.log(JSON.stringify(rootState, null, 2));
     if (check.toAndFomExist(rootState, payload)) {
       commit('add', payload);
     } else {
       debug('store:commutes')('to/from not valid', payload);
     }
   },
-  update(ctx, payload) {
-    console.log('-------------------------update entered', payload);
+  update({state, commit, dispatch}, payload) {
     let commute = new Commute(payload);
     let prev = state[commute.id];
-    if (prev) {
-      const isUnchanged = (attr) => commute[attr] === prev[attr];
-      if (essentialAttrs.every(isUnchanged)) {
-        ctx.commit('update', commute);
-      } else {
-        ctx.dispatch('clone', commute);
-        ctx.commit('remove', prev);
-      }
+    assert.ok(prev, `no commute with id ${commute.id} found`);
+    const isUnchanged = (attr) => commute[attr] === prev[attr];
+    const importantDiff = Object.keys(commute)
+      .filter((key) => setOfEssentialAttrs.has(key));
+    if (importantDiff.every(isUnchanged)) {
+      commit('update', commute);
     } else {
-      ctx.dispatch('add', commute);
+      dispatch('clone', commute);
+      commit('remove', prev);
     }
   },
-  clone(ctx, payload) {
+  clone({state, dispatch}, payload) {
     let commute = new Commute(payload);
     let prev = state[commute.id];
-    if (prev) ctx.dispatch('add', {...prev, ...commute});
+    assert.ok(prev, `no commute with ${commute.id} found`);
+    prev = {...state[commute.id]};
+    delete commute.id;
+    delete prev.id;
+    let clone = new Commute({...prev, ...commute});
+    delete clone.duration; // when mode/time/byOrAt change, duration changes.
+    dispatch('add', clone);
   }
 };
 
 export const getters = {
-  included(state, getters, rootState) {
-    let locationsIncluded = getters['locations/included'];
-    return new Set(
-      Object.entries(state)
-        .filter(([id, commute]) => {
-          return commute.included
-            && locationsIncluded[commute.from]
-            && locationsIncluded[commute.to];
-        })
-    );
+  included(state, _, __, rootGetters) {
+    let locationsIncluded = rootGetters['locations/included'];
+    return Object.entries(state)
+      .filter(([id, commute]) => {
+        return commute.included
+          && locationsIncluded[commute.from]
+          && locationsIncluded[commute.to];
+      })
+      .reduce((acc, [id, commute]) => Object.assign(acc, {[id]: commute}), {});
   }
 };
 

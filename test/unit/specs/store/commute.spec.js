@@ -1,5 +1,5 @@
 import {
-  mutations, getters, actions, Commute, roundTime
+  /* mutations, getters, actions,*/ Commute, roundTime
 } from '@/store/modules/commutes.js';
 import commutes from '@/store/modules/commutes.js';
 import {assert, AssertionError} from 'chai';
@@ -30,10 +30,16 @@ const makeExample = () => {
     mode: 'walking'
   };
 };
-const makeExampleWithout = (...masked) => {
-  const example = makeExample();
-  masked.forEach((mask) => delete example[mask]);
-  return example;
+const expectedId = `??-[walking]->_ibE_ibE arrive_by ${now}`;
+// const makeExampleWithout = (...masked) => {
+//   const example = makeExample();
+//   masked.forEach((mask) => delete example[mask]);
+//   return example;
+// };
+const makePreppedStore = ()=>{
+  const store = makeStore();
+  store.commit('commutes/add', makeExample());
+  return store;
 };
 describe('Commute class', ()=>{
   describe('initialization', ()=>{
@@ -170,12 +176,82 @@ describe('Commute Store', ()=>{
         const store = makeStore();
         sinon.spy(store, 'commit');
         store.dispatch('commutes/add', makeExample());
-        console.log((store.commit.getCall(0)));
-        // assert.deepEqual(
-        //   store.commit.getCall(0).args,
-        //   ['commute/add', makeExample()]
-        // );
+        assert.deepEqual(
+          store.commit.getCall(0).args,
+          ['commutes/add', makeExample(), undefined]
+        );
+      });
+    });
+    describe('update', ()=>{
+      it('correctly updates a commute\'s notes', ()=>{
+        // this checks the clone action as well.
+        const store = makePreppedStore();
+        sinon.spy(store, 'commit');
+        sinon.spy(store, 'dispatch');
+        let notesOnly = {id: expectedId, notes: 'foo'};
+        store.dispatch('commutes/update', notesOnly);
+        assert.deepEqual(
+          store.commit.getCall(0).args,
+          ['commutes/update', notesOnly, undefined],
+          'mismatched update commit call'
+        );
+      });
+      it('update creates a new commute when mode is changed', ()=>{
+        const store = makePreppedStore();
+        sinon.spy(store, 'commit');
+        sinon.spy(store, 'dispatch');
+        let biking = {id: expectedId, mode: 'bicycling'};
+        store.dispatch('commutes/update', biking);
+        assert.deepEqual(
+          store.dispatch.getCall(1).args,
+          ['commutes/clone', biking],
+          'mismatched clone commit call'
+        );
+        let expected = {
+          ...makeExample(), ...biking,
+          id: expectedId.replace('walking', 'bicycling')
+        };
+        assert.deepEqual(
+          store.commit.getCall(0).args,
+          ['commutes/add', expected, undefined],
+          'mismatched add commit call'
+        );
+        assert.deepEqual(
+          store.commit.getCall(1).args,
+          ['commutes/remove', {
+            ...makeExample(),
+            id: expectedId, included: false
+            // while it was called with included:true, the getCall returns the
+            // commute object from the vuex store, which has been updated.
+          }, undefined],
+          'mismatched remove commit call'
+        );
+      });
+      it('rejects a updates referring to nonexistant commutes', ()=>{
+        const store = makeStore();
+        let notesOnly = {id: expectedId, notes: 'foo'};
+        assert.throws(
+          ()=>store.dispatch('commutes/update', notesOnly),
+          AssertionError
+        );
+      });
+    });
+  });
+  describe('getters', ()=>{
+    describe('included', ()=>{
+      it('works', ()=>{
+        let store = makeStore();
+        console.log(store.getters['commutes/included']);
+        assert.deepEqual(store.getters['commutes/included'], {});
+        store.commit('commutes/add', makeExample());
+        assert.deepEqual(
+          Object.keys(store.getters['commutes/included']),
+          [expectedId]
+        );
+        store.commit('locations/remove', {id: '??'});
+        assert.deepEqual(store.getters['commutes/included'], {});
       });
     });
   });
 });
+// });
