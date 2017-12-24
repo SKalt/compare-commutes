@@ -94,15 +94,15 @@ export const mutations = {
 
 export const getters = {
   included(state) {
-    return Object.entries(state.byId)
+    return Object.entries(state)
       .filter(([id, loc]) => loc.included)
       .map(([id, loc]) => loc);
   },
   origins(state, getters) {
-    return getters.included.filter((loc) => loc.type === 'origin');
+    return getters.included.filter((loc) => loc.isOrigin);
   },
   destinations(state, getters) {
-    return getters.included.filter((loc) => loc.type !== 'origin');
+    return getters.included.filter((loc) => !loc.isOrigin);
   }
 };
 

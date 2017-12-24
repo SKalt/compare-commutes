@@ -69,69 +69,94 @@ describe('Location class', ()=>{
   });
 });
 describe('Location store', ()=>{
-  describe('adds a location', ()=>{
-    it('from just coordinates', ()=>{
-      let store = makeStore();
-      assert.isObject(store.state);
-      store.commit('add', {coords: [0, 0]});
-      assert.deepEqual(store.state['??'].included, true, 'id not included');
-      Object.keys(store.state['??']).forEach(
-        (key) => assert.equal(
-          store.state['??'][key],
-          {lat: 0, lng: 0, id: '??', included: true}[key],
-          key + ' mismatched'
-        )
-      );
-    });
-    const checkAllKeys = (obj) => {
-      Object.keys(obj).forEach(
-        (key) => assert.equal(
-          obj[key],
-          {lat: 0, lng: 0, id: '??', included: true}[key],
-          key + ' mismatched'
-        )
-      );
-    };
-    it('from lat/lng', ()=>{
-      let store = makeStore();
-      assert.isObject(store.state);
-      store.commit('add', {lat: 0, lng: 0});
-      assert.deepEqual(store.state['??'].included, true, 'id not included');
-      checkAllKeys(store.state['??']);
-    });
-    it('avoids duplicating locations', ()=>{
-      let store = makeStore();
-      assert.isObject(store.state);
-      store.commit('add', {lat: 0, lng: 0});
-      store.commit('add', {coords: [0, 0]});
-      assert.deepEqual(store.state['??'].included, true, 'id not included');
-      checkAllKeys(store.state['??']);
-      assert.deepEqual(Object.keys(store.state), ['??'], 'unexpected ids');
-    });
-  });
   const makePreppedStore = () => {
     let store = makeStore();
     store.commit('add', {coords: [0, 0], notes: 'notes'});
     return store;
   };
-  describe('updates a location', ()=>{
-    it(' \'s notes successfully', ()=>{
-      const store = makePreppedStore();
-      store.commit('update', {id: '??', notes: 'foo'});
-      assert.equal(store.state['??'].notes, 'foo', 'didn\'t update');
+  describe('mutations', ()=>{
+    describe('adds a location', ()=>{
+      it('from just coordinates', ()=>{
+        let store = makeStore();
+        assert.isObject(store.state);
+        store.commit('add', {coords: [0, 0]});
+        assert.deepEqual(store.state['??'].included, true, 'id not included');
+        Object.keys(store.state['??']).forEach(
+          (key) => assert.equal(
+            store.state['??'][key],
+            {lat: 0, lng: 0, id: '??', included: true}[key],
+            key + ' mismatched'
+          )
+        );
+      });
+      const checkAllKeys = (obj) => {
+        Object.keys(obj).forEach(
+          (key) => assert.equal(
+            obj[key],
+            {lat: 0, lng: 0, id: '??', included: true}[key],
+            key + ' mismatched'
+          )
+        );
+      };
+      it('from lat/lng', ()=>{
+        let store = makeStore();
+        assert.isObject(store.state);
+        store.commit('add', {lat: 0, lng: 0});
+        assert.deepEqual(store.state['??'].included, true, 'id not included');
+        checkAllKeys(store.state['??']);
+      });
+      it('avoids duplicating locations', ()=>{
+        let store = makeStore();
+        assert.isObject(store.state);
+        store.commit('add', {lat: 0, lng: 0});
+        store.commit('add', {coords: [0, 0]});
+        assert.deepEqual(store.state['??'].included, true, 'id not included');
+        checkAllKeys(store.state['??']);
+        assert.deepEqual(Object.keys(store.state), ['??'], 'unexpected ids');
+      });
     });
-    it(' \'s alias successfully', ()=>{
-      const store = makePreppedStore();
-      store.commit('update', {id: '??', alias: 'foo'});
-      assert.equal(store.state['??'].alias, 'foo', 'didn\'t update');
+    describe('updates a location', ()=>{
+      it(' \'s notes successfully', ()=>{
+        const store = makePreppedStore();
+        store.commit('update', {id: '??', notes: 'foo'});
+        assert.equal(store.state['??'].notes, 'foo', 'didn\'t update');
+      });
+      it(' \'s alias successfully', ()=>{
+        const store = makePreppedStore();
+        store.commit('update', {id: '??', alias: 'foo'});
+        assert.equal(store.state['??'].alias, 'foo', 'didn\'t update');
+      });
+    });
+    describe('removing a location', ()=>{
+      it('removes the inclusion but not the byId entry', ()=>{
+        const store = makePreppedStore();
+        store.commit('remove', {id: '??'});
+        assert.equal(store.state['??'].notes, 'notes', 'deleted byId entry');
+        assert.isFalse(store.state['??'].included, 'inclusion not removed');
+      });
     });
   });
-  describe('removing a location', ()=>{
-    it('removes the inclusion but not the byId entry', ()=>{
+  describe('getters', ()=>{
+    it('included', ()=>{
       const store = makePreppedStore();
-      store.commit('remove', {id: '??'});
-      assert.equal(store.state['??'].notes, 'notes', 'deleted byId entry');
-      assert.isFalse(store.state['??'].included, 'inclusion not removed');
+      assert.lengthOf(store.getters.included, 1, 'unexpected `included ` len');
+      assert.equal(store.getters.included[0].id, '??', 'wrong id');
+    });
+    it('origins', ()=>{
+      const store = makePreppedStore();
+      console.log([...store.getters.origins]);
+      assert.lengthOf(store.getters.origins, 0, 'unexpected `origins ` len');
+      store.commit('update', {id: '??', isOrigin: true});
+      assert.lengthOf(store.getters.origins, 1, 'unexpected `origins ` len');
+      assert.equal(store.getters.origins[0].id, '??', 'wrong id');
+    });
+    it('destinations', ()=>{
+      const store = makePreppedStore();
+      console.log([...store.getters.destinations]);
+      assert.lengthOf(store.getters.destinations, 1, 'unexpected length');
+      assert.equal(store.getters.destinations[0].id, '??', 'wrong id');
+      store.commit('update', {id: '??', isOrigin: true});
+      assert.lengthOf(store.getters.destinations, 0, 'unexpected length');
     });
   });
 });

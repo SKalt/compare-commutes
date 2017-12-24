@@ -177,5 +177,5 @@ describe('Commute Store', ()=>{
         // );
       });
     });
-  })
+  });
 });
