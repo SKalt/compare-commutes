@@ -96,13 +96,13 @@ export const getters = {
   included(state) {
     return Object.entries(state)
       .filter(([id, loc]) => loc.included)
-      .map(([id, loc]) => loc);
+      .reduce((acc, [id, loc]) => Object.assign(acc, {[id]: loc}), {});
   },
   origins(state, getters) {
-    return getters.included.filter((loc) => loc.isOrigin);
+    return Object.values(getters.included).filter((loc) => loc.isOrigin);
   },
   destinations(state, getters) {
-    return getters.included.filter((loc) => !loc.isOrigin);
+    return Object.values(getters.included).filter((loc) => !loc.isOrigin);
   }
 };
 
@@ -122,4 +122,4 @@ export const actions = {
 export const columns = [
   'id', 'address', 'isOrigin', 'notes', 'alias', /* 'coords',*/ 'lat', 'lng'
 ];
-export default {mutations, state: {}, getters, actions};
+export default {mutations, state: {}, getters, actions, namespaced: true};

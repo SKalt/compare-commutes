@@ -139,8 +139,14 @@ describe('Location store', ()=>{
   describe('getters', ()=>{
     it('included', ()=>{
       const store = makePreppedStore();
-      assert.lengthOf(store.getters.included, 1, 'unexpected `included ` len');
-      assert.equal(store.getters.included[0].id, '??', 'wrong id');
+      assert.deepEqual(
+        Object.keys(store.getters.included), ['??'], 'unexpected keys'
+      );
+      assert.ok(store.getters.included['??'], 'wrong id');
+      store.commit('remove', {id: '??'});
+      assert.deepEqual(
+        Object.keys(store.getters.included), [], 'unexpected keys'
+      );
     });
     it('origins', ()=>{
       const store = makePreppedStore();
