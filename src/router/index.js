@@ -7,25 +7,26 @@ export default new Router({
   routes: [
     {path: '/',
       name: 'root',
-      // redirect to /add/origins iff no db found.
+      // main.js will redirect to /add/origins iff no db found.
       children: [
         {path: '/add',
           children: [
-            {path: '/origin',
-              name: 'addOrigin'
+            {path: 'origins',
+              name: 'addOrigins'
               // component:
             },
-            {path: '/destination',
-              name: 'addDest'
+            {path: 'destinations',
+              name: 'addDestinations'
               // component:
             },
-            {path: '/commute',
-              name: 'addCommute'
+            {path: 'commutes',
+              name: 'addCommutes'
               // component:
             }
           ]
         },
-        {path: '/explore'
+        {path: '/compare',
+          name: 'compare'
         // component: explore
         }
       ]

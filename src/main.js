@@ -4,7 +4,7 @@ import Vue from 'vue';
 import App from './App';
 import router from './router';
 import debug from 'debug';
-if (NODE_ENV != 'production') {
+if (process.env.NODE_ENV != 'production') {
   debug.disable('*');
   debug.enable('app:*');
   // window.map = map;
@@ -14,7 +14,6 @@ if (NODE_ENV != 'production') {
 }
 
 Vue.config.productionTip = false;
-
 
 /* eslint-disable no-new */
 new Vue({
