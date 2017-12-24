@@ -70,36 +70,33 @@ export const mutations = {
   add(state, payload) {
     assert(payload, `Falsy location: ${payload}`);
     const loc = new Location(payload);
-    if (!(loc.id in state.byId)) {
-      set(state.byId, loc.id, {...loc});
+    if (!(loc.id in state)) {
+      set(state, loc.id, {...loc, included: true});
     } else {
       log(`${loc.id} already present`, loc);
+      set(state[loc.id], 'included', true);
     }
-    set(state.included, loc.id, true);
   },
-  /**
-   * [remove description]
-   * @param  {[type]} state [description]
-   * @param  {[type]} payload  [description]
-   */
   remove(state, payload) {
     const loc = new Location(payload);
-    if (loc.id in state.included) set(state.included, loc.id, false);
+    if (loc.id in state) set(state[loc.id], 'included', false);
   },
   update(state, payload) {
     let update = new Location(payload);
-    update = {...state.byId[update.id], ...update};
-    if (update.id in state.byId) {
-      set(state.byId, update.id, update);
+    if (update.id in state) {
+      update = {...state[update.id], ...update, included: true};
+      set(state, update.id, update);
+    } else {
+      console.warn(`${update} matches no location and so was not updated`);
     }
   }
 };
 
 export const getters = {
   included(state) {
-    return Object.entries(state.included)
-      .filter(([id, included]) => included)
-      .map(([id, _]) => state.byId[id]);
+    return Object.entries(state.byId)
+      .filter(([id, loc]) => loc.included)
+      .map(([id, loc]) => loc);
   },
   origins(state, getters) {
     return getters.included.filter((loc) => loc.type === 'origin');
@@ -122,11 +119,7 @@ export const actions = {
   }
 };
 
-export const initialState = {
-  byId: {}, included: {}
-};
-
 export const columns = [
   'id', 'address', 'isOrigin', 'notes', 'alias', /* 'coords',*/ 'lat', 'lng'
 ];
-export default {mutations, state: initialState, getters, actions};
+export default {mutations, state: {}, getters, actions};

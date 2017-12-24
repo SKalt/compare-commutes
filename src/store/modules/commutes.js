@@ -2,18 +2,80 @@
 import debug from 'debug';
 debug.disable('store:*');
 import transitModes from '@/assets/transit-modes.json';
+import {assert} from 'chai';
+import Vue from 'vue';
+const set = Vue.set;
+// import db from '@/db.js';
 // utilities
+const essentialAttrs = ['to', 'from', 'byOrAt', 'time', 'mode'];
+const makeId = ({to, from, byOrAt, time, mode}) => {
+  return `${from}-[${mode}]->${to} ${byOrAt} ${time}`;
+};
+// TODO: gather to some utils module.
+export const roundTime = (date) => {
+  let year = date.getFullYear();
+  let month = date.getMonth();
+  let day = date.getDate();
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  return new Date(year, month, day, hours, minutes);
+};
+/**
+ * [Commute description]
+ */
+export class Commute {
+  /**
+   * Enusre a valid commute;
+   * @param {Object} obj
+   */
+  constructor(obj) {
+    assert.isObject(obj);
+    let {id, to, from, mode, time, byOrAt, frequency, notes, duration} = obj;
+    if (mode !== undefined) {
+      assert(
+        transitModes.some((allowed) => allowed == mode),
+        `mode ${mode} invalid`
+      );
+    }
+    if (byOrAt !== undefined) {
+      assert(
+        byOrAt == 'arrive_by' || byOrAt == 'depart_at',
+        `${byOrAt} is invalid; should be arrive_by or depart_at`
+      );
+    }
+    if (time !== undefined) {
+      assert.isNotNaN(new Date(time).getDate(), `invalid date/time ${time}`);
+      time = roundTime(new Date(time));
+    }
+    if (!id) {
+      // to, from validated in store actions
+      essentialAttrs.forEach((attr) => assert(attr in obj, attr + ` missing`));
+      id = makeId(obj);
+    }
+    if (frequency !== undefined) {
+      assert.isNumber(frequency, `invalid frequency ${frequency}`);
+      assert(frequency > 0, `invalid frequency ${frequency}: must be > 0`);
+    }
+    if (notes) assert.isString(notes, 'non-str note ${note}');
+    let props = {id, to, from, mode, time, byOrAt, frequency, notes, duration};
+    props = Object.entries(props)
+      .filter(([key, value])=>value !== undefined)
+      .reduce((acc, [key, value]) => Object.assign(acc, {[key]: value}), {});
+    Object.assign(this, props);
+  }
+}
+
 const check = {
-  hashable(payload) {
-    return ['to', 'from', 'byOrAt', 'time', 'mode'].every((e) => payload[e]);
-  },
-  modeAllowed({mode}) {
-    let allowed = transitModes.some((allowed) => allowed == mode);
-    if (!allowed) debug('store:commutes')('invalid transit mode: ' + mode);
-    return allowed;
-  },
+  // hashable(payload) {
+  // return ['to', 'from', 'byOrAt', 'time', 'mode'].every((e) => e in payload);
+  // },
+  // modeAllowed({mode}) {
+  //   let allowed = transitModes.some();
+  //   if (!allowed) debug('store:commutes')('invalid transit mode: ' + mode);
+  //   return allowed;
+  // },
   endpointExists(rootState, endpoint) {
-    return rootState.locations.included[endpoint];
+    return (rootState.locations[endpoint] || {}).included;
   },
   toAndFomExist(rootState, {to, from}) {
     // let included = rootState.locations.included;
@@ -28,98 +90,100 @@ const check = {
     return true;
   }
 };
-const hash = ({to, from, byOrAt, time, mode}) => {
-  // from = from.slice(0,8);
-  // to = to.slice(0,8);
-  return `${from}-[${mode}]->${to} ${byOrAt || '???'} ${time}`;
-};
-// const assign = (state, payload, name) => {
-//   state.byId[payload.id][name] = payload[name];
-// };
+
 export const columns = [
   'from', 'to', 'byOrAt', 'time', 'duration',
   'frequency', 'mode'
 ];
+
 // mutations
 
-const add = (commutes, payload) => {
-  if (check.hashable(payload)) {
-    payload.id = hash(payload);
-    if (commutes.byId[payload.id]) {
+
+export const mutations = {
+  add(commutes, payload) {
+    let commute = new Commute(payload);
+    if (commutes[commute.id]) {
       console.warn('id already present', payload);
-      commutes.included[payload.id] = true;
     } else {
-      commutes.included[payload.id] = true;
-      commutes.byId[payload.id] = payload;
+      set(commutes, commute.id, {...commute});
     }
+    set(commutes[commute.id], 'included', true);
+  },
+  update(commutes, payload) {
+    let update = new Commute(payload);
+    let prev = commutes[update.id];
+    if (prev) {
+      set(commutes, update.id, {...prev, ...update});
+    } else {
+      console.warn('No such commute', update);
+    }
+  },
+  remove(commutes, {id}) {
+    if (commutes[id]) set(commutes[id], 'included', false);
   }
 };
 
-export const mutations = {
-  addCommute: add,
-  updateCommuteFrequency(commutes, {id, frequency}) {
-    if (Number.isFinite(frequency) && state.byId[id]) {
-      commutes.byId[id].frequency = frequency;
-    } else {
-      console.warn('invalid frequency updata', frequency);
-    }
-  },
-  updateCommuteDuration(commutes, {id, duration}) {
-    if (Number.isFinite(duration) && commutes.byId[id]) {
-      commutes.byId[id].duration = duration;
-    } else {
-      console.warn('invalid duration updata', duration);
-    }
-  },
-  removeCommute(commutes, {id}) {
-    if (commutes.included[id]) commutes.included[id] = false;
-  }
-};
-const clone = (name, context, payload) => {
-  let {dispatch, state: commutes} = context;
-  let {id} = payload;
-  if (id in commutes.byId && payload[name] != commutes.byId[id][name]) {
-    dispatch(
-      'addCommute',
-      Object.assign({}, commutes.byId[id], {[name]: payload[name]})
-    );
-  }
-};
+// const clone = (name, context, payload) => {
+//   let {dispatch, state: commutes} = context;
+//   let {id} = payload;
+//   if (id in commutes && payload[name] != commutes[id][name]) {
+//     dispatch(
+//       'addCommute',
+//       Object.assign({}, commutes[id], {[name]: payload[name]})
+//     );
+//   }
+// };
+
 export const actions = {
-  addCommute({commit, rootState}, payload) {
+  startup({state}) {
+    // TODO: add
+  },
+  add({commit, rootState}, payload) {
     // console.log(JSON.stringify(rootState, null, 2));
-    if (check.toAndFomExist(rootState, payload) && check.modeAllowed(payload)) {
-      commit('addCommute', payload);
+    if (check.toAndFomExist(rootState, payload)) {
+      commit('add', payload);
     } else {
-      debug('store:commutes')('payload not valid', payload);
+      debug('store:commutes')('to/from not valid', payload);
     }
   },
-  cloneByMode(context, payload) {
-    if (check.modeAllowed(payload)) clone('mode', context, payload);
+  update(ctx, payload) {
+    console.log('-------------------------update entered', payload);
+    let commute = new Commute(payload);
+    let prev = state[commute.id];
+    if (prev) {
+      const isUnchanged = (attr) => commute[attr] === prev[attr];
+      if (essentialAttrs.every(isUnchanged)) {
+        ctx.commit('update', commute);
+      } else {
+        ctx.dispatch('clone', commute);
+        ctx.commit('remove', prev);
+      }
+    } else {
+      ctx.dispatch('add', commute);
+    }
   },
-  clone(context, payload) {
-    clone(payload.by, context, payload);
+  clone(ctx, payload) {
+    let commute = new Commute(payload);
+    let prev = state[commute.id];
+    if (prev) ctx.dispatch('add', {...prev, ...commute});
   }
 };
 
 export const getters = {
-  includedCommutes(state, unusedLocalGetters, rootState) {
-    // console.log(rootState.locations.state);
-    let locationsIncluded = rootState.locations.included;
+  included(state, getters, rootState) {
+    let locationsIncluded = getters['locations/included'];
     return new Set(
-      Object.keys(state.byId)
-        .filter((id) => {
-          return state.included[id]
-            && locationsIncluded[state.byId[id].from]
-            && locationsIncluded[state.byId[id].to];
+      Object.entries(state)
+        .filter(([id, commute]) => {
+          return commute.included
+            && locationsIncluded[commute.from]
+            && locationsIncluded[commute.to];
         })
     );
   }
 };
 
-// check dexie db first
-export const initialState = {
-  included: {}, byId: {}
+// let state = localStorage.getItem('commutes') || initialState;
+export default {
+  mutations, actions, getters, state: {}, namespaced: true
 };
-let state = localStorage.getItem('commutes') || initialState;
-export default {state, mutations, actions, getters, namespaced: true};
