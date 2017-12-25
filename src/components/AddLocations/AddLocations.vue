@@ -20,6 +20,7 @@
       placeholder="Search for places"
       @placechanged="handleSelection"
     ></VueGoogleAutocomplete>
+    <edit-location v-if="aLocationSelected"></edit-location>
   </div>
 </template>
 

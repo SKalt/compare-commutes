@@ -1,8 +1,16 @@
 import info from '@/components/Info/Info.vue';
 import VueGoogleAutocomplete from 'vue-google-autocomplete';
+import EditLocation from '@/components/EditLocation/EditLocation.vue';
 export default {
   props: ['type'], // type = origin | destination
-  components: {info, VueGoogleAutocomplete},
+  components: {info, VueGoogleAutocomplete, EditLocation},
+  computed: {
+    aLocationSelected() {
+      let {type} = this.$store.getters['selection/selected'];
+      console.log(type);
+      return type && type != 'commute';
+    }
+  },
   methods: {
     handleSelection(...e) {
       console.log(e);
