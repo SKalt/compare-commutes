@@ -1,7 +1,14 @@
-import info from '@/components/Info/Info.vue'
+import info from '@/components/Info/Info.vue';
+import vSelect from 'vue-multiselect';
 export default {
-  data(){
-    return { };
-  },
-  components: {info}
-}
+  components: {info, vSelect},
+  computed: {
+    includedLocations() {
+      return Object.values(this.$store.getters['locations/included'])
+        .map((loc) => {
+          let name = loc.alias || loc.address || loc.id;
+          return {name, value: loc};
+        });
+    }
+  }
+};

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="col-xs-12">
     <info>
       <span>
         A commute is a trip you plan on doing with any sort of frequency.  To add a
@@ -9,6 +9,23 @@
         each commute takes.
       </span>
     </info>
+    <v-select
+      class="col-md-4"
+      track-by="name"
+      label="name"
+      placeholder="from"
+      :options="includedLocations"
+      @input="e => select('from', e)"
+      ></v-select>
+    <v-select
+      class="col-md-4"
+      placeholder="to"
+      track-by="name"
+      label="name"
+      :options="includedLocations"
+      @input="e => select('to', e)"
+      ></v-select>
+
   </div>
 </template>
 
