@@ -32,6 +32,7 @@
       :value="selected.notes"
       >
     </textarea>
+    <time-picker class="col-xs-6" v-if="type == 'destination'" ></time-picker>
     <!-- delete -->
     <div class="col-xs-12">
       <button

@@ -6,11 +6,10 @@
           This app compares net commute times of 'origins'.  To add an origin,
         </span>
         <span v-else>
-          A destination is a place you regularly go, such as work, the grocery store,
-          or the gym.  To add a destination,
+          A destination is a place you regularly go, such as work, the grocery
+          store, or the gym.  To add a destination,
         </span>
-        either click the map or look up an address using the geocoder,
-        then click 'Add'.
+        either click the map or select an address using the geocoder.
       </span>
     </info>
     <!-- use className to pass classes to <input /> -->
@@ -21,7 +20,8 @@
       @placechanged="handleSelection"
       @inputChange="unselectOnEmpty"
     ></VueGoogleAutocomplete>
-    <edit-location v-if="aLocationSelected"></edit-location>
+    <edit-location v-if="aLocationSelected" :type="type">
+    </edit-location>
   </div>
 </template>
 
