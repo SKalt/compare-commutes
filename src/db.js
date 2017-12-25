@@ -29,3 +29,4 @@ filterOutOldEntries(db.locations);
 filterOutOldEntries(db.commutes);
 
 export default db;
+// if (process.env.NODE_ENV == 'development') window.db = db;

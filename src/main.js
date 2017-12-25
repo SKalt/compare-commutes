@@ -4,9 +4,11 @@ import Vue from 'vue';
 import App from './App';
 import router from './router';
 import debug from 'debug';
+import store from './store/index.js';
 if (process.env.NODE_ENV != 'production') {
   debug.disable('*');
   debug.enable('app:*');
+  window.store = store;
   // window.map = map;
   // window.events = events;
 } else {

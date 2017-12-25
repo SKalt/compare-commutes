@@ -6,6 +6,6 @@ export const mutations = {
 };
 export const initialState = {
   id: '-1',
-  type:'location'
+  type: 'location'
 };
-export default {state:initialState, mutations};
+export default {state: initialState, mutations, namespaced: true};
