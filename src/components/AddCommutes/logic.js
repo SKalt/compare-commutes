@@ -18,7 +18,6 @@ export default {
   },
   methods: {
     endpoint(end, e) {
-      console.log(e);
       this.value[end] = e.value.id;
     }
   }

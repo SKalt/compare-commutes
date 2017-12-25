@@ -7,17 +7,14 @@ export default {
   computed: {
     aLocationSelected() {
       let {type} = this.$store.getters['selection/selected'];
-      console.log(type);
       return type && type != 'commute';
     }
   },
   methods: {
     unselectOnEmpty(e) {
-      console.log(e);
       if (!e.newVal) this.$store.commit('selection/select', {id: '-1'});
     },
     handleSelection(...e) {
-      console.log(e);
       let {
         administrative_area_level_1: state,
         // country,

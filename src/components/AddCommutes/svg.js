@@ -25,5 +25,4 @@ Vue.use(Inline, {
   data: icons
 });
 const modes = Object.keys(icons);
-console.log(icons);
 export default modes;
