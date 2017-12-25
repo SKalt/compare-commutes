@@ -11,7 +11,7 @@ module.exports = {
       .assert.containsText(`#to-add-origins`, `Add Origins`)
       .click(`#to-add-origins`)
       .waitForElementVisible('body', 1000)
-      .assert.urlEquals(devServer + `/#/add/origins`)
+      .assert.urlEquals(devServer + `/#/add/locations/origin`)
       .assert.containsText('#app h2', 'Add Origins')
       //
       .waitForElementVisible(`#to-add-destinations`, 5000)
@@ -19,7 +19,7 @@ module.exports = {
       .assert.containsText(`#to-add-destinations`, `Add Destinations`)
       .click(`#to-add-destinations`)
       .waitForElementVisible('body', 1000)
-      .assert.urlEquals(devServer + `/#/add/destinations`)
+      .assert.urlEquals(devServer + `/#/add/locations/destination`)
       .assert.containsText('#app h2', 'Add Destinations')
       //
       .waitForElementVisible(`#to-add-commutes`, 5000)
