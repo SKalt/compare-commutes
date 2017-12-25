@@ -13,6 +13,13 @@
         then click 'Add'.
       </span>
     </info>
+    <!-- use className to pass classes to <input /> -->
+    <!-- use id to pass id to the google autocomplete (required?) -->
+    <VueGoogleAutocomplete
+      id="autocompleteGeocoder"
+      placeholder="Search for places"
+      @placechanged="handleSelection"
+    ></VueGoogleAutocomplete>
   </div>
 </template>
 

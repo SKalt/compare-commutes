@@ -76,19 +76,6 @@ describe('Location store', ()=>{
   };
   describe('mutations', ()=>{
     describe('adds a location', ()=>{
-      it('from just coordinates', ()=>{
-        let store = makeStore();
-        assert.isObject(store.state);
-        store.commit('add', {coords: [0, 0]});
-        assert.deepEqual(store.state['??'].included, true, 'id not included');
-        Object.keys(store.state['??']).forEach(
-          (key) => assert.equal(
-            store.state['??'][key],
-            {lat: 0, lng: 0, id: '??', included: true}[key],
-            key + ' mismatched'
-          )
-        );
-      });
       const checkAllKeys = (obj) => {
         Object.keys(obj).forEach(
           (key) => assert.equal(
@@ -98,18 +85,11 @@ describe('Location store', ()=>{
           )
         );
       };
-      it('from lat/lng', ()=>{
-        let store = makeStore();
-        assert.isObject(store.state);
-        store.commit('add', {lat: 0, lng: 0});
-        assert.deepEqual(store.state['??'].included, true, 'id not included');
-        checkAllKeys(store.state['??']);
-      });
       it('avoids duplicating locations', ()=>{
         let store = makeStore();
         assert.isObject(store.state);
-        store.commit('add', {lat: 0, lng: 0});
-        store.commit('add', {coords: [0, 0]});
+        store.commit('add', {lat: 0, lng: 0, id: 'foo'});
+        store.commit('add', {coords: [0, 0], id: 'foo'});
         assert.deepEqual(store.state['??'].included, true, 'id not included');
         checkAllKeys(store.state['??']);
         assert.deepEqual(Object.keys(store.state), ['??'], 'unexpected ids');
@@ -165,4 +145,28 @@ describe('Location store', ()=>{
       assert.lengthOf(store.getters.destinations, 0, 'unexpected length');
     });
   });
+  // TODO: adapt mutaiton tests for action testing.
+  // describe('actions', ()=>{
+  //   it('from just coordinates', ()=>{
+  //     let store = makeStore();
+  //     assert.isObject(store.state);
+  //     store.dispatch('add', {coords: [0, 0]});
+  //     assert.deepEqual(store.state['??'].included, true, 'id not included');
+  //     Object.keys(store.state['??']).forEach(
+  //       (key) => assert.equal(
+  //         store.state['??'][key],
+  //         {lat: 0, lng: 0, id: '??', included: true}[key],
+  //         key + ' mismatched'
+  //       )
+  //     );
+  //   });
+  //   it('from lat/lng', ()=>{
+  //     let store = makeStore();
+  //     assert.isObject(store.state);
+  //     store.commit('add', {lat: 0, lng: 0});
+  //     assert.deepEqual(store.state['??'].included, true, 'id not included');
+  //     checkAllKeys(store.state['??']);
+  //   });
+  //
+  // })
 });

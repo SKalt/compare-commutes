@@ -35,8 +35,10 @@
 </template>
 
 <script>
+import store from '@/store/index.js';
 let titleCase = (word) => (word[0] || '').toUpperCase() + word.slice(1);
 export default {
+  store,
   computed: {
     title() {
       switch (this.$route.path) {

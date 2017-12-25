@@ -68,13 +68,13 @@ export const mutations = {
    * @param {Object} payload a location
    */
   add(state, payload) {
-    assert(payload, `Falsy location: ${payload}`);
-    const loc = new Location(payload);
-    if (!(loc.id in state)) {
-      set(state, loc.id, {...loc, included: true});
+    // log('entered: ', payload);
+    assert.isDefined(payload.id);
+    if (!(payload.id in state)) {
+      set(state, payload.id, {...payload, included: true});
     } else {
-      log(`${loc.id} already present`, loc);
-      set(state[loc.id], 'included', true);
+      log(`${payload.id} already present`, payload);
+      set(state[payload.id], 'included', true);
     }
   },
   remove(state, payload) {
@@ -116,6 +116,12 @@ export const actions = {
     set(state, 'byId', byId);
     set(state, 'included', included);
     return true;
+  },
+  add({commit}, payload) {
+    assert(payload, `Falsy location: ${payload}`);
+    const loc = new Location(payload);
+    commit('add', loc);
+    commit('selection/select', loc, {root: true});
   }
 };
 
