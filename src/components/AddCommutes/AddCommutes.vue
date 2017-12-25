@@ -15,7 +15,7 @@
       label="name"
       placeholder="from"
       :options="includedLocations"
-      @input="e => select('from', e)"
+      @input="e => endpoint('from', e)"
       ></v-select>
     <v-select
       class="col-md-4"
@@ -23,7 +23,7 @@
       track-by="name"
       label="name"
       :options="includedLocations"
-      @input="e => select('to', e)"
+      @input="e => endpoint('to', e)"
       ></v-select>
 
   </div>
