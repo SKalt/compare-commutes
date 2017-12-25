@@ -1,9 +1,9 @@
 module.exports = {
   'clicking router links changes url': function(browser) {
+    const devServer = browser.globals.devServerURL;
     // automatically uses dev Server port from /config.index.js
     // default: http://localhost:8080
     // see nightwatch.conf.js
-    const devServer = browser.globals.devServerURL;
     browser
       .url(devServer)
       .waitForElementVisible(`#to-add-origins`, 5000)
@@ -39,30 +39,15 @@ module.exports = {
       .assert.containsText('#app h2', 'Compare')
       //
       .end();
-    // const _test1 = (toAdd)=>{
-    //   browser
-    //     .url(devServer)
-    //     .waitForElementVisible(`#to-add-${toAdd}`, 5000)
-    //     .assert.elementPresent(`#to-add-${toAdd}`)
-    //     .assert.containsText(`#to-add-${toAdd}`, `Add ${
-    //       toAdd[0].toUpperCase() + toAdd.slice(1)
-    //     }`)
-    //     .click(`#to-add-${toAdd}`)
-    //     .waitForElementVisible('body', 1000)
-    //     .assert.urlEquals(devServer + `/#/add/${toAdd}`)
-    //     .end();
-    // };
-    // _test1('origins');
-    // _test1('destinations');
-    // _test1('commutes');
-    // browser
-    //   .url(devServer)
-    //   .waitForElementVisible(`#to-compare`, 5000)
-    //   .assert.elementPresent(`#to-compare`)
-    //   .assert.containsText(`#to-compare`, 'Compare Commutes')
-    //   .click(`#to-compare`)
-    //   .waitForElementVisible('body', 1000)
-    //   .assert.urlEquals(devServer + `/#/compare`)
-    //   .end();
+  },
+  'The navbar does not change the url query': function(browser) {
+    const devServer = browser.globals.devServerURL;
+    browser
+      .url(`${devServer}/#/?foo=true`)
+      .waitForElementVisible(`#to-add-origins`, 5000)
+      .click(`#to-add-origins`)
+      .waitForElementVisible('body', 1000)
+      .assert.urlEquals(devServer + `/#/add/locations/origin?foo=true`)
+      .end();
   }
 };
