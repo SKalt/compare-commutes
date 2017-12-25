@@ -79,7 +79,9 @@ export const mutations = {
   },
   remove(state, payload) {
     const loc = new Location(payload);
-    if (loc.id in state) set(state[loc.id], 'included', false);
+    if (loc.id in state) {
+      set(state[loc.id], 'included', false);
+    };
   },
   update(state, payload) {
     let update = new Location(payload);

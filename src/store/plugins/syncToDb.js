@@ -1,5 +1,7 @@
 import db from '@/db.js';
-
+import debug from 'debug';
+debug.enable('db:*');
+const log = debug('db:sync');
 /**
  * performs allowed actions
  * @param  {String} action
@@ -8,13 +10,14 @@ import db from '@/db.js';
  * @return {Promise}
  */
 function perform(action, table, payload) {
+  log(action, table, payload);
   switch (action) {
   case 'add':
     return table.put(payload, payload.id);
   case 'upate':
-    return table.update(payload, payload.id);
+    return table.update(payload.id, payload);
   case 'remove':
-    return table.update({included: false}, payload.id);
+    return table.update( payload.id, {included: false});
   case 'delete':
     return table.delete(payload.id);
   }

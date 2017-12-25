@@ -1,7 +1,7 @@
 // Sync store with dexie on startup and mutations/actions
 import Dexie from 'dexie';
 const db = new Dexie('geodb');
-
+if (process.env.NODE_ENV != 'production') window.db = db;
 db.version(1).stores({
   locations: 'id,[lat+lng],notes,is_origin,last_touch',
   commutes: 'id,[origin+dest+by_or_at+time+mode],notes,duration,last_touch'
