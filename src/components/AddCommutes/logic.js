@@ -1,10 +1,12 @@
 import info from '@/components/Info/Info.vue';
 import vSelect from 'vue-multiselect';
+import modes from './svg.js';
+import ModeCheckbox from '@/components/ModeCheckbox/ModeCheckbox.vue';
 export default {
-  data(){
-    return {value: {}};
+  data() {
+    return {value: {}, modes};
   },
-  components: {info, vSelect},
+  components: {info, vSelect, ModeCheckbox},
   computed: {
     includedLocations() {
       return Object.values(this.$store.getters['locations/included'])

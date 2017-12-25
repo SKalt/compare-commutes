@@ -25,10 +25,16 @@
       :options="includedLocations"
       @input="e => endpoint('to', e)"
       ></v-select>
-
+      <mode-checkbox
+        v-for="mode in modes"
+        :key="mode"
+        :mode="mode"
+        @click="select(mode)"
+        ></mode-checkbox>
   </div>
 </template>
 
 <script src="./logic.js"></script>
 
 <style src="./style.css"></style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
