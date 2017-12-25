@@ -114,14 +114,14 @@ export const actions = {
       .map(({id, included}) =>({[id]: included}))
       .reduce((acc, r) => Object.assing(acc, r), {});
     set(state, 'byId', byId);
-    set(state, 'included', included);
+    set(state, 'included', {...included, type: 'location'});
     return true;
   },
   add({commit}, payload) {
     assert(payload, `Falsy location: ${payload}`);
     const loc = new Location(payload);
     commit('add', loc);
-    commit('selection/select', loc, {root: true});
+    commit('selection/select', {...loc, type: 'location'}, {root: true});
   }
 };
 
