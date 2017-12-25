@@ -19,6 +19,7 @@
       id="autocompleteGeocoder"
       placeholder="Search for places"
       @placechanged="handleSelection"
+      @inputChange="unselectOnEmpty"
     ></VueGoogleAutocomplete>
     <edit-location v-if="aLocationSelected"></edit-location>
   </div>

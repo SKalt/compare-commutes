@@ -12,6 +12,10 @@ export default {
     }
   },
   methods: {
+    unselectOnEmpty(e) {
+      console.log(e);
+      if (!e.newVal) this.$store.commit('selection/select', {id: '-1'});
+    },
     handleSelection(...e) {
       console.log(e);
       let {
