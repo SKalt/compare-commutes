@@ -5,7 +5,17 @@ export const mutations = {
   }
 };
 export const initialState = {
-  id: '-1',
-  type: 'location'
+  id: null,
+  type: null
 };
-export default {state: initialState, mutations, namespaced: true};
+export const getters = {
+  selected({id, type}, _, rootState, rootGetters ) {
+    let selected = rootState[type == 'commute' ? 'commutes' : 'locations'][id];
+    if (selected) {
+      return {...selected, type};
+    } else {
+      return {};
+    }
+  }
+};
+export default {state: initialState, getters, mutations, namespaced: true};
