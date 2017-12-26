@@ -2,9 +2,9 @@
 import debug from 'debug';
 const log = debug('component:EditLocation');
 debug.enable('component:*');
-import TimePicker from '@/components/TimePicker/TimePicker.vue';
+import {DateTimePicker} from 'vue-d-you-look-at-the-time';
 export default {
-  components: {TimePicker},
+  components: {'date-time-picker': DateTimePicker},
   props: ['type'],
   computed: {
     selected() {

@@ -10,6 +10,7 @@
     <label for="include-as-origin">Use this location as an origin</label>
     <!-- alias -->
     <input
+      title="alias"
       class="col-xs-12"
       type="text"
       :value="$store.getters['selection/selected'].alias"
@@ -17,6 +18,7 @@
       />
     <!-- address -->
     <input
+      title="address"
       class="col-xs-12"
       type="text"
       :value="$store.getters['selection/selected'].address"
@@ -32,7 +34,7 @@
       :value="selected.notes"
       >
     </textarea>
-    <time-picker class="col-xs-6" v-if="type == 'destination'" ></time-picker>
+    <date-time-picker class="col-xs-6" v-if="type == 'destination'" />
     <!-- delete -->
     <div class="col-xs-12">
       <button
