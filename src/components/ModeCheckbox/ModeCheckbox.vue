@@ -1,5 +1,5 @@
 <template>
-  <span class="col-xs-1 mode-checkbox">
+  <span class="btn mode-checkbox">
     <inline
       :name="mode"
       :class="{'mode-selected': selected}"
