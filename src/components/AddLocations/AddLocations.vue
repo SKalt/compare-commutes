@@ -15,6 +15,7 @@
     <!-- use className to pass classes to <input /> -->
     <!-- use id to pass id to the google autocomplete (required?) -->
     <VueGoogleAutocomplete
+      class="col-xs-12"
       id="autocompleteGeocoder"
       placeholder="Search for places"
       @placechanged="handleSelection"
