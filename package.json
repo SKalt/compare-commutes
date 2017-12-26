@@ -21,6 +21,7 @@
     "mapbox-gl": "^0.43.0",
     "polyline": "^0.2.0",
     "vue": "^2.5.2",
+    "vue-d-you-look-at-the-time": "^1.0.1",
     "vue-google-autocomplete": "^1.0.13",
     "vue-inline": "^1.0.1",
     "vue-multiselect": "^2.0.8",
